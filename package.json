@@ -1,0 +1,29 @@
+{
+  "name": "paysentry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The missing control plane for AI agent payments",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint packages/*/src/**/*.ts",
+    "typecheck": "tsc --build packages/*/tsconfig.json",
+    "clean": "npm run clean --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "eslint": "^9.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paysentry/paysentry"
+  }
+}

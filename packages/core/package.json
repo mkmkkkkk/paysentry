@@ -1,0 +1,25 @@
+{
+  "name": "@paysentry/core",
+  "version": "1.0.0",
+  "description": "Core types, configuration, and shared utilities for PaySentry",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "tsc --build --clean"
+  },
+  "license": "MIT",
+  "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paysentry/paysentry",
+    "directory": "packages/core"
+  }
+}

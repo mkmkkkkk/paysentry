@@ -1,0 +1,28 @@
+{
+  "name": "@paysentry/control",
+  "version": "1.0.0",
+  "description": "Declarative policy engine for AI agent payment control",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "tsc --build --clean"
+  },
+  "dependencies": {
+    "@paysentry/core": "1.0.0"
+  },
+  "license": "MIT",
+  "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paysentry/paysentry",
+    "directory": "packages/control"
+  }
+}
