@@ -25,11 +25,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Debug - show effective tsconfig for core
+        run: npx tsc -p packages/core/tsconfig.json --showConfig
+
+      - name: Build core with tsc --build
+        run: npx tsc --build packages/core/tsconfig.json --verbose 2>&1 | tail -30
+
+      - name: Verify core declarations
         run: |
-          npm run build -w packages/core
-          npm run build -w packages/control -w packages/observe -w packages/protect -w packages/sandbox
-          npm run build -w packages/x402 -w packages/demo
+          echo "=== core dist ==="
+          ls -la packages/core/dist/
+          echo "=== Check for .d.ts files ==="
+          find packages/core/dist -name "*.d.ts" -type f || echo "NO .d.ts FILES"
+
+      - name: Build all
+        run: npx tsc --build packages/core packages/control packages/observe packages/protect packages/sandbox packages/x402 packages/demo
 
       - name: Test
         run: npm test
