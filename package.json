@@ -8,7 +8,7 @@
     "examples/mcp-payment-server"
   ],
   "scripts": {
-    "build": "tsc --build packages/*/tsconfig.json",
+    "build": "npm run build -w packages/core && npm run build -w packages/control -w packages/observe -w packages/protect -w packages/sandbox && npm run build -w packages/x402 -w packages/demo",
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint packages/*/src/**/*.ts",
     "typecheck": "tsc --build packages/*/tsconfig.json",

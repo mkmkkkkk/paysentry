@@ -25,25 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build
+      - name: Build (dependency-ordered)
+        run: |
+          npm run build -w packages/core
+          npm run build -w packages/control -w packages/observe -w packages/protect -w packages/sandbox
+          npm run build -w packages/x402 -w packages/demo
 
       - name: Test
         run: npm test
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Typecheck
-        run: npm run typecheck
