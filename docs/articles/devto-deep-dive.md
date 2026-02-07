@@ -3,7 +3,7 @@ title: "x402 vs ACP vs AP2: Why your AI agent needs a payment control plane"
 published: false
 description: "The AI agent payment landscape in 2026 looks like the API gateway chaos of 2015. Here's how to bring order to the chaos with PaySentry — an open-source control plane for agent payments."
 tags: ai, payments, opensource, security
-cover_image: https://raw.githubusercontent.com/MichaelYangzk/paysentry/main/docs/assets/cover.png
+cover_image: https://raw.githubusercontent.com/mkmkkkkk/paysentry/main/docs/assets/cover.png
 ---
 
 The AI agent payment landscape in 2026 looks a lot like the API gateway landscape in 2015 — multiple competing protocols, zero standardized middleware, and developers stitching together bespoke solutions that break in production. x402 processes over $600 million in annualized volume. Agent Commerce Protocol (ACP) is gaining traction for agent-to-agent transactions. AP2 is positioning itself as the "next-gen" alternative. And Visa TAP is bridging traditional card rails to agentic workflows. Each protocol solves a different slice of the problem. None of them solve the governance problem.
@@ -545,7 +545,7 @@ PaySentry is open-source (MIT license) and under active development. Here's the 
 
 ### Get Involved
 
-- **GitHub:** [github.com/MichaelYangzk/paysentry](https://github.com/MichaelYangzk/paysentry)
+- **GitHub:** [github.com/mkmkkkkk/paysentry](https://github.com/mkmkkkkk/paysentry)
 - **Docs:** [paysentry.dev](https://paysentry.dev) *(coming soon)*
 - **Discord:** [discord.gg/paysentry](https://discord.gg/paysentry) *(coming soon)*
 - **Contributing:** See `CONTRIBUTING.md` in the repo
@@ -576,7 +576,7 @@ npm install @paysentry/core @paysentry/observe @paysentry/control @paysentry/pro
 
 **Run the quickstart:**
 ```bash
-git clone https://github.com/MichaelYangzk/paysentry.git
+git clone https://github.com/mkmkkkkk/paysentry.git
 cd paysentry
 npm install
 npm run build

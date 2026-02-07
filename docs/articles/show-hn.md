@@ -138,7 +138,7 @@ This is an early release. The core pillars (Observe, Control, Protect, Test) are
 - Integration with MCP servers (so agents can use PaySentry transparently)
 - SOC 2 compliance for the control plane itself
 
-Everything is open-source (MIT license). The repo is at github.com/MichaelYangzk/paysentry. Documentation is at mkyang.ai/paysentry. The full architecture whitepaper (adapted from our earlier AgentGate research) is at mkyang.ai/blog/agentgate-whitepaper.
+Everything is open-source (MIT license). The repo is at github.com/mkmkkkkk/paysentry. Documentation is at mkyang.ai/paysentry. The full architecture whitepaper (adapted from our earlier AgentGate research) is at mkyang.ai/blog/agentgate-whitepaper.
 
 ## Ask HN
 
@@ -153,6 +153,6 @@ This started because I lost $2,400 to a timeout bug. I'm hoping PaySentry preven
 
 ---
 
-GitHub: https://github.com/MichaelYangzk/paysentry
+GitHub: https://github.com/mkmkkkkk/paysentry
 Docs: https://mkyang.ai/paysentry
 Whitepaper: https://mkyang.ai/blog/agentgate-whitepaper
