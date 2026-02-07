@@ -25,6 +25,45 @@ PaySentry is the missing layer between your agents and their wallets.
 
 ---
 
+## See it in action
+
+<p align="center">
+  <img src="docs/demo-terminal.svg" alt="PaySentry Demo — AI agent payments being allowed, blocked, and rate limited in real-time" width="800" />
+</p>
+
+<details>
+<summary><b>Text version</b> (if SVG doesn't render)</summary>
+
+```
+  PaySentry Demo — AI Agent Payment Controls
+  ══════════════════════════════════════════════════
+
+  Policy: Max $100/tx | Approval above $40 | Daily $500 | 5 tx/min
+  Agent:  agent-research-01  |  Balance: $10000.00
+
+  [1/5] $25.00  → api.openai.com      ✅ ALLOWED
+  [2/5] $45.00  → anthropic.com       ⚠️ REQUIRES APPROVAL
+  [3/5] $150.00 → sketchy-api.xyz     ❌ BLOCKED (above $100 limit)
+  [4/5] $30.00  → api.openai.com      ✅ ALLOWED + 🔔 repeat recipient alert
+  [5/5] 6 rapid payments              ❌ RATE LIMITED (5 tx/min)
+
+  Summary:
+    Allowed: 4  ($65.00)
+    Pending: 1  ($45.00)
+    Blocked: 2  ($150.00 + rate limit)
+    Alerts:  4  (large tx, rate spike)
+```
+
+</details>
+
+**Try it yourself:**
+
+```bash
+npx paysentry-demo
+```
+
+---
+
 ## Quick Start
 
 ```bash
