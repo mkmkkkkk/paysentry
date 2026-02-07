@@ -1,7 +1,7 @@
 {
   "name": "@paysentry/observe",
-  "version": "1.0.0",
-  "description": "Payment observability for AI agents — track what agents spend, where, and why",
+  "version": "1.0.1",
+  "description": "Payment observability for AI agents \u2014 track what agents spend, where, and why",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,13 +16,16 @@
     "clean": "tsc --build --clean"
   },
   "dependencies": {
-    "@paysentry/core": "1.0.0"
+    "@paysentry/core": ">=1.0.0"
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/paysentry/paysentry",
+    "url": "https://github.com/mkmkkkkk/paysentry",
     "directory": "packages/observe"
   }
 }

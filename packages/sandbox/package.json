@@ -1,6 +1,6 @@
 {
   "name": "@paysentry/sandbox",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mock multi-protocol payment environment for testing AI agent payments",
   "type": "module",
   "main": "dist/index.js",
@@ -16,13 +16,16 @@
     "clean": "tsc --build --clean"
   },
   "dependencies": {
-    "@paysentry/core": "1.0.0"
+    "@paysentry/core": ">=1.0.0"
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/paysentry/paysentry",
+    "url": "https://github.com/mkmkkkkk/paysentry",
     "directory": "packages/sandbox"
   }
 }
