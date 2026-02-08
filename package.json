@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "npm run build -w packages/core && npm run build -w packages/control -w packages/observe -w packages/protect -w packages/sandbox && npm run build -w packages/x402 -w packages/demo",
-    "test": "npm run test --workspaces --if-present",
+    "test": "node --import tsx --test packages/*/test/*.test.ts",
     "lint": "eslint packages/*/src/**/*.ts",
     "typecheck": "tsc --build packages/*/tsconfig.json",
     "clean": "npm run clean --workspaces --if-present"
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "eslint": "^9.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   },
   "engines": {

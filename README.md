@@ -219,6 +219,22 @@ console.log(ALL_SCENARIOS.map(s => s.name));
 
 See [`examples/`](examples/) for complete runnable demos.
 
+### Run the E2E example
+
+The full x402 payment flow with policy enforcement, circuit breaker, spend tracking, and alerts:
+
+```bash
+npm install && npm run build
+npx tsx examples/05-x402-e2e.ts
+```
+
+Output shows allow/block/alert decisions for 5 scenarios:
+1. Small payment ($5) — allowed and settled
+2. Medium payment ($75) — blocked by approval policy
+3. Large payment ($1500) — blocked by budget
+4. Multiple payments — budget threshold alert at 80%
+5. Facilitator failures — circuit breaker opens
+
 ---
 
 ## Architecture

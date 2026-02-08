@@ -45,3 +45,6 @@ jobs:
 
       - name: Build demo
         run: cd packages/demo && npx tsc --build --force
+
+      - name: Run tests
+        run: npm test
