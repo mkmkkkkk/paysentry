@@ -1,0 +1,32 @@
+{
+  "name": "@paysentry/wallet",
+  "version": "1.0.0",
+  "description": "Wallet-agnostic adapter layer for PaySentry — plug any wallet backend (Coinbase, local signer, Openfort, Safe) behind PaySentry policy controls",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "dependencies": {
+    "@paysentry/core": ">=1.0.0",
+    "@paysentry/control": ">=1.0.0",
+    "@paysentry/observe": ">=1.0.0"
+  },
+  "license": "MIT",
+  "files": ["dist", "README.md"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkmkkkkk/paysentry",
+    "directory": "packages/wallet"
+  },
+  "keywords": ["wallet", "ai-agent", "payment", "policy", "paysentry", "coinbase", "x402"]
+}
