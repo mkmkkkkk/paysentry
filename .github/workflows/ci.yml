@@ -40,6 +40,9 @@ jobs:
       - name: Build sandbox
         run: cd packages/sandbox && npx tsc --build --force
 
+      - name: Build wallet
+        run: cd packages/wallet && npx tsc --build --force
+
       - name: Build x402
         run: cd packages/x402 && npx tsc --build --force
 
