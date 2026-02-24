@@ -4,6 +4,12 @@
 // Plug any wallet backend behind PaySentry policy controls.
 // =============================================================================
 
+// ✨ Quick start (recommended)
+export { createWallet } from './factory.js';
+export type { CreateWalletOptions } from './factory.js';
+export { presets } from './presets.js';
+export type { SpendLimits } from './presets.js';
+
 // Orchestrator
 export { PaySentryWallet } from './paysentry-wallet.js';
 

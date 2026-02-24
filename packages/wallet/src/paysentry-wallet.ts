@@ -249,6 +249,28 @@ export class PaySentryWallet {
   }
 
   /**
+   * Shorthand for `executePayment()`. Ideal for quick, simple payments.
+   *
+   * @example
+   * ```ts
+   * await wallet.pay(25, '0xRecipient', 'API credits');
+   * await wallet.pay(25, '0xRecipient'); // reason defaults to empty
+   * ```
+   */
+  async pay(
+    amount: number,
+    to: string,
+    reason: string = '',
+  ): Promise<PaymentResult> {
+    return this.executePayment({
+      amount,
+      currency: this.config.defaultCurrency,
+      to,
+      reason,
+    });
+  }
+
+  /**
    * Get wallet balance for a currency.
    */
   async getBalance(currency?: string): Promise<WalletBalance> {
