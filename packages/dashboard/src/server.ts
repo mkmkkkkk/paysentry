@@ -5,15 +5,21 @@
 // =============================================================================
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'http';
-import type { EventBus, PaySentryEvent } from '@paysentry/core';
+import type { EventBus, AgentId, DisputeStatus } from '@paysentry/core';
 import type { PolicyEngine } from '@paysentry/control';
-import type { SpendTracker, SpendAnalytics, SpendAlerts } from '@paysentry/observe';
+import type { SpendTracker, SpendAnalytics } from '@paysentry/observe';
 import type { TransactionProvenance, DisputeManager } from '@paysentry/protect';
 import type { AgentRegistry } from '@paysentry/a2a';
 
 export interface DashboardConfig {
   readonly port?: number;
   readonly host?: string;
+  /** Bearer token for API auth. If set, all non-OPTIONS requests must include it. */
+  readonly bearerToken?: string;
+  /** CORS allowed origins. Defaults to '*'. */
+  readonly allowedOrigins?: string[];
+  /** Max concurrent SSE connections. Defaults to 100. */
+  readonly maxSSEConnections?: number;
 }
 
 export interface DashboardDeps {
@@ -33,6 +39,9 @@ export interface DashboardDeps {
 export function createDashboardServer(deps: DashboardDeps, config?: DashboardConfig) {
   const port = config?.port ?? 3100;
   const host = config?.host ?? '0.0.0.0';
+  const bearerToken = config?.bearerToken;
+  const allowedOrigin = config?.allowedOrigins?.[0] ?? '*';
+  const maxSSE = config?.maxSSEConnections ?? 100;
 
   // SSE clients
   const sseClients = new Set<ServerResponse>();
@@ -46,18 +55,27 @@ export function createDashboardServer(deps: DashboardDeps, config?: DashboardCon
   });
 
   const server = createServer((req, res) => {
-    const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
+    const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
     const path = url.pathname;
 
     // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
       return;
+    }
+
+    // Auth — opt-in Bearer token
+    if (bearerToken) {
+      const auth = req.headers.authorization;
+      if (auth !== `Bearer ${bearerToken}`) {
+        json(res, 401, { error: 'Unauthorized' });
+        return;
+      }
     }
 
     // Route
@@ -67,7 +85,7 @@ export function createDashboardServer(deps: DashboardDeps, config?: DashboardCon
     if (path === '/alerts') return handleAlerts(deps, url, res);
     if (path === '/disputes') return handleDisputes(deps, url, res);
     if (path === '/agents') return handleAgents(deps, res);
-    if (path === '/events') return handleSSE(sseClients, req, res);
+    if (path === '/events') return handleSSE(sseClients, maxSSE, req, res);
     if (path === '/' || path === '/index.html') return handleHTML(deps, res);
 
     json(res, 404, { error: 'Not found', availableEndpoints: ['/status', '/transactions', '/policies', '/alerts', '/disputes', '/agents', '/events'] });
@@ -94,10 +112,11 @@ function handleStatus(deps: DashboardDeps, res: ServerResponse) {
 }
 
 function handleTransactions(deps: DashboardDeps, url: URL, res: ServerResponse) {
-  const limit = parseInt(url.searchParams.get('limit') ?? '50');
+  const rawLimit = parseInt(url.searchParams.get('limit') ?? '50');
+  const limit = Number.isNaN(rawLimit) ? 50 : Math.min(Math.max(rawLimit, 1), 1000);
   const agentId = url.searchParams.get('agent_id');
-  const filter: any = { limit };
-  if (agentId) filter.agentId = agentId;
+  const filter: { limit: number; agentId?: AgentId } = { limit };
+  if (agentId) filter.agentId = agentId as AgentId;
   const txs = deps.tracker.query(filter);
   json(res, 200, { transactions: txs, count: txs.length, total: deps.tracker.size });
 }
@@ -111,9 +130,15 @@ function handleAlerts(deps: DashboardDeps, url: URL, res: ServerResponse) {
   json(res, 200, { message: 'Use SSE /events endpoint to receive alerts in real-time', endpoint: '/events' });
 }
 
+const VALID_DISPUTE_STATUSES: readonly DisputeStatus[] = ['open', 'investigating', 'resolved_refunded', 'resolved_denied', 'resolved_partial', 'escalated'];
+
 function handleDisputes(deps: DashboardDeps, url: URL, res: ServerResponse) {
   const status = url.searchParams.get('status');
-  const disputes = deps.disputes.query(status ? { status: status as any } : {});
+  if (status && !VALID_DISPUTE_STATUSES.includes(status as DisputeStatus)) {
+    json(res, 400, { error: `Invalid status. Valid values: ${VALID_DISPUTE_STATUSES.join(', ')}` });
+    return;
+  }
+  const disputes = deps.disputes.query(status ? { status: status as DisputeStatus } : {});
   json(res, 200, { disputes, count: disputes.length });
 }
 
@@ -125,7 +150,12 @@ function handleAgents(deps: DashboardDeps, res: ServerResponse) {
   json(res, 200, { agents: deps.registry.list() });
 }
 
-function handleSSE(clients: Set<ServerResponse>, req: IncomingMessage, res: ServerResponse) {
+function handleSSE(clients: Set<ServerResponse>, maxConnections: number, req: IncomingMessage, res: ServerResponse) {
+  if (clients.size >= maxConnections) {
+    json(res, 429, { error: 'Too many SSE connections', max: maxConnections });
+    return;
+  }
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',

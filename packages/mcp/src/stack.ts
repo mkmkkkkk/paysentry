@@ -39,6 +39,7 @@ export class PaySentryStack {
   readonly wallet: WalletState;
   readonly config: McpServerConfig;
 
+  private static readonly MAX_ALERT_LOG = 500;
   private readonly alertLog: SpendAlert[] = [];
 
   constructor(config: McpServerConfig) {
@@ -77,6 +78,9 @@ export class PaySentryStack {
     // Wire up alerts to event bus
     this.alerts.onAlert((alert) => {
       this.alertLog.push(alert);
+      if (this.alertLog.length > PaySentryStack.MAX_ALERT_LOG) {
+        this.alertLog.splice(0, this.alertLog.length - PaySentryStack.MAX_ALERT_LOG);
+      }
       this.events.emit({ type: 'alert.fired', alert });
     });
   }

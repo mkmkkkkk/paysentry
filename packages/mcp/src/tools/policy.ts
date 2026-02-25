@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { PaySentryStack } from '../stack.js';
-import type { PolicyId, PolicyAction, TimeWindow } from '@paysentry/core';
+import type { PolicyId, PolicyAction, TimeWindow, PaymentProtocol } from '@paysentry/core';
 
 const PolicyRuleSchema = z.object({
   id: z.string(),
@@ -58,7 +58,20 @@ export function registerPolicyTool(server: McpServer, stack: PaySentryStack): vo
         }
         case 'create': {
           if (!policy) return { content: [{ type: 'text' as const, text: 'Error: policy object required for create' }], isError: true };
-          stack.createPolicy(policy as any);
+          const spendPolicy = {
+            id: policy.id as PolicyId,
+            name: policy.name,
+            description: policy.description,
+            enabled: policy.enabled,
+            rules: policy.rules.map(r => ({
+              ...r,
+              action: r.action as PolicyAction,
+              conditions: { ...r.conditions, protocols: r.conditions.protocols as PaymentProtocol[] | undefined },
+            })),
+            budgets: policy.budgets.map(b => ({ window: b.window as TimeWindow, maxAmount: b.maxAmount, currency: b.currency })),
+            cooldownMs: policy.cooldownMs,
+          };
+          stack.createPolicy(spendPolicy);
           return { content: [{ type: 'text' as const, text: JSON.stringify({ success: true, policyId: policy.id, message: `Policy "${policy.name}" created` }) }] };
         }
         case 'delete': {
