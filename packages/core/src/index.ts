@@ -11,6 +11,9 @@ export type {
   PolicyId,
   DisputeId,
   ServiceId,
+  IntentId,
+  MandateId,
+  EscrowId,
 
   // Transaction
   PaymentProtocol,
@@ -25,6 +28,23 @@ export type {
   SpendPolicy,
   BudgetLimit,
   PolicyEvaluation,
+
+  // Agent Identity
+  AgentCapability,
+  AgentProfile,
+
+  // Payment Intent (A2A)
+  IntentStatus,
+  PaymentIntent,
+  PaymentCondition,
+
+  // Mandate (A2A)
+  MandateStatus,
+  AgentMandate,
+
+  // Escrow (A2A)
+  EscrowStatus,
+  EscrowContract,
 
   // Dispute
   DisputeStatus,
@@ -54,4 +74,13 @@ export type {
 // Utility functions
 export { generateId, generateTransactionId, generateDisputeId } from './utils.js';
 export { createTransaction } from './factory.js';
+export type { CreateTransactionInput } from './factory.js';
 export { matchesGlob } from './glob.js';
+
+// Storage
+export type { StorageAdapter, StorageFilter } from './storage.js';
+export { MemoryStorage } from './storage.js';
+
+// Events
+export type { PaySentryEvent, PaySentryEventType } from './events.js';
+export { EventBus } from './events.js';

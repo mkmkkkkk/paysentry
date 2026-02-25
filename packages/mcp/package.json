@@ -1,0 +1,40 @@
+{
+  "name": "@paysentry/mcp",
+  "version": "1.0.0",
+  "description": "MCP server for PaySentry — AI agents consume payment controls via MCP tools",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "paysentry-mcp": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@paysentry/core": "^1.0.2",
+    "@paysentry/control": "^1.0.2",
+    "@paysentry/observe": "^1.0.2",
+    "@paysentry/protect": "^1.0.2",
+    "@paysentry/sandbox": "^1.0.2"
+  },
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkmkkkkk/paysentry",
+    "directory": "packages/mcp"
+  }
+}

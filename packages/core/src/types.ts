@@ -365,6 +365,138 @@ export interface SpendAlert {
 }
 
 // ---------------------------------------------------------------------------
+// Agent Identity — multi-agent systems need identity and capabilities
+// ---------------------------------------------------------------------------
+
+/** What an agent is authorized to do */
+export type AgentCapability = 'pay' | 'receive' | 'negotiate' | 'dispute' | 'approve' | 'mandate';
+
+/**
+ * AgentProfile represents a registered agent in the PaySentry system.
+ * Agents discover each other through the AgentRegistry.
+ */
+export interface AgentProfile {
+  /** Agent identifier */
+  readonly id: AgentId;
+  /** Human/machine-readable name */
+  readonly name: string;
+  /** What this agent can do */
+  readonly capabilities: readonly AgentCapability[];
+  /** Computed trust score 0-100 based on transaction history */
+  trustScore: number;
+  /** Total amount spent through PaySentry */
+  totalSpent: number;
+  /** ISO 8601 registration timestamp */
+  readonly registeredAt: string;
+  /** Active policy IDs */
+  readonly policies: readonly PolicyId[];
+  /** Arbitrary agent metadata */
+  readonly metadata: Readonly<Record<string, unknown>>;
+}
+
+// ---------------------------------------------------------------------------
+// Payment Intent — agent-to-agent payment negotiation
+// ---------------------------------------------------------------------------
+
+export type IntentId = string & { readonly __brand: 'IntentId' };
+
+export type IntentStatus = 'proposed' | 'countered' | 'accepted' | 'rejected' | 'executed' | 'expired';
+
+/**
+ * PaymentIntent represents a proposed payment between two agents.
+ * Flow: propose → accept/counter/reject → execute
+ */
+export interface PaymentIntent {
+  readonly id: IntentId;
+  readonly from: AgentId;
+  readonly to: AgentId;
+  readonly amount: number;
+  readonly currency: string;
+  readonly purpose: string;
+  readonly protocol: PaymentProtocol;
+  status: IntentStatus;
+  readonly expiresAt: string;
+  readonly createdAt: string;
+  updatedAt: string;
+  /** Counter-offer from the recipient */
+  counterOffer?: { amount: number; reason: string };
+  /** Conditions that must be met before execution */
+  readonly conditions: readonly PaymentCondition[];
+}
+
+export interface PaymentCondition {
+  readonly type: 'service_delivered' | 'time_elapsed' | 'data_received' | 'approval_obtained';
+  readonly description: string;
+  satisfied: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Mandate — recurring payment authorization between agents
+// ---------------------------------------------------------------------------
+
+export type MandateId = string & { readonly __brand: 'MandateId' };
+
+export type MandateStatus = 'active' | 'exhausted' | 'expired' | 'revoked';
+
+/**
+ * AgentMandate grants one agent the right to pull funds from another,
+ * subject to limits. Evaluated by PolicyEngine — it's a policy, not a bypass.
+ */
+export interface AgentMandate {
+  readonly id: MandateId;
+  /** Who authorizes payments */
+  readonly grantor: AgentId;
+  /** Who can pull funds */
+  readonly grantee: AgentId;
+  /** Max per single transaction */
+  readonly maxPerTransaction: number;
+  /** Max cumulative across all transactions */
+  readonly maxCumulative: number;
+  /** Rate limit */
+  readonly maxPerWindow?: { amount: number; window: TimeWindow };
+  readonly currency: string;
+  /** Restrict what the mandate can be used for */
+  readonly allowedPurposes?: readonly string[];
+  /** Restrict which recipients */
+  readonly allowedRecipients?: readonly string[];
+  status: MandateStatus;
+  readonly createdAt: string;
+  readonly expiresAt: string;
+  revokedAt?: string;
+  /** Running total spent under this mandate */
+  spent: number;
+  /** Running transaction count */
+  transactionCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// Escrow — hold funds until conditions are met
+// ---------------------------------------------------------------------------
+
+export type EscrowId = string & { readonly __brand: 'EscrowId' };
+
+export type EscrowStatus = 'funded' | 'conditions_met' | 'released' | 'refunded' | 'expired';
+
+/**
+ * EscrowContract holds funds between two agents until conditions are met.
+ * Critical for agent-to-agent trust.
+ */
+export interface EscrowContract {
+  readonly id: EscrowId;
+  readonly payer: AgentId;
+  readonly payee: AgentId;
+  readonly amount: number;
+  readonly currency: string;
+  readonly purpose: string;
+  readonly conditions: readonly PaymentCondition[];
+  status: EscrowStatus;
+  readonly createdAt: string;
+  readonly expiresAt: string;
+  releasedAt?: string;
+  refundedAt?: string;
+}
+
+// ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
 
