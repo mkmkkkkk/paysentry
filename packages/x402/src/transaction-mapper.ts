@@ -72,8 +72,9 @@ export function extractAmount(requirements: X402PaymentRequirements): number {
 
   // x402 amounts are typically in base units (e.g., USDC has 6 decimals)
   // For USDC-like tokens, divide by 1e6. For ETH-like, divide by 1e18.
+  // For Nano (XNO), divide by 1e30 (raw is the smallest unit).
   // Default to 6 decimals (USDC) as that's the most common x402 use case.
-  const decimals = inferDecimals(requirements.scheme);
+  const decimals = inferDecimals(requirements.scheme, requirements.network);
   return parsed / Math.pow(10, decimals);
 }
 
@@ -107,7 +108,7 @@ export async function mapToTransaction(
   const agentId = await extractAgent(payload, config);
   const amount = extractAmount(requirements);
   const recipient = extractRecipient(requirements);
-  const currency = config.defaultCurrency ?? inferCurrency(requirements.scheme) ?? 'USDC';
+  const currency = config.defaultCurrency ?? inferCurrency(requirements.scheme, requirements.network) ?? 'USDC';
 
   return createTransaction({
     agentId,
@@ -166,12 +167,26 @@ function extractPayerAddress(payload: X402PaymentPayload): string | undefined {
 }
 
 /**
- * Infer decimal places from the payment scheme.
+ * Infer decimal places from the payment scheme and network.
  * Defaults to 6 (USDC convention).
+ *
+ * Network takes precedence over scheme because the scheme can be shared
+ * across networks (e.g. x402 `exact` is used for both USDC and Nano).
  */
-function inferDecimals(scheme: string): number {
-  const normalized = scheme?.toLowerCase() ?? '';
-  if (normalized.includes('eth') || normalized.includes('ether')) {
+function inferDecimals(scheme: string, network?: string): number {
+  const normalizedScheme = scheme?.toLowerCase() ?? '';
+  const normalizedNetwork = network?.toLowerCase() ?? '';
+
+  // Nano (XNO) uses raw as its smallest unit (1 nano = 10^30 raw).
+  // A `nano:mainnet` (CAIP-2) network identifies it regardless of scheme.
+  if (
+    normalizedNetwork.includes('nano') ||
+    normalizedScheme.includes('nano') ||
+    normalizedScheme.includes('xno')
+  ) {
+    return 30;
+  }
+  if (normalizedScheme.includes('eth') || normalizedScheme.includes('ether')) {
     return 18;
   }
   // USDC, USDT, and most stablecoins use 6 decimals
@@ -179,13 +194,23 @@ function inferDecimals(scheme: string): number {
 }
 
 /**
- * Infer currency symbol from the payment scheme.
+ * Infer currency symbol from the payment scheme and network.
  */
-function inferCurrency(scheme: string): string | undefined {
-  const normalized = scheme?.toLowerCase() ?? '';
-  if (normalized.includes('usdc')) return 'USDC';
-  if (normalized.includes('usdt')) return 'USDT';
-  if (normalized.includes('eth') || normalized.includes('ether')) return 'ETH';
-  if (normalized.includes('dai')) return 'DAI';
+function inferCurrency(scheme: string, network?: string): string | undefined {
+  const normalizedScheme = scheme?.toLowerCase() ?? '';
+  const normalizedNetwork = network?.toLowerCase() ?? '';
+
+  // Nano (XNO) is identified by its CAIP-2 network (nano:mainnet) or asset name.
+  if (
+    normalizedNetwork.includes('nano') ||
+    normalizedScheme.includes('nano') ||
+    normalizedScheme.includes('xno')
+  ) {
+    return 'XNO';
+  }
+  if (normalizedScheme.includes('usdc')) return 'USDC';
+  if (normalizedScheme.includes('usdt')) return 'USDT';
+  if (normalizedScheme.includes('eth') || normalizedScheme.includes('ether')) return 'ETH';
+  if (normalizedScheme.includes('dai')) return 'DAI';
   return undefined;
 }

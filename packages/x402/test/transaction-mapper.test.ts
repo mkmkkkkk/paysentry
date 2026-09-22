@@ -40,6 +40,17 @@ describe('extractAmount', () => {
     assert.equal(amount, 1); // 1e18 / 1e18 = 1
   });
 
+  it('converts Nano (XNO) raw units (30 decimals)', () => {
+    const nanoReq = {
+      ...mockRequirements,
+      scheme: 'exact',
+      network: 'nano:mainnet',
+      maxAmountRequired: '1000000000000000000000000000000', // 1e30 raw = 1 XNO
+    };
+    const amount = extractAmount(nanoReq);
+    assert.equal(amount, 1); // 1e30 / 1e30 = 1
+  });
+
   it('returns 0 for missing amount', () => {
     const empty = { ...mockRequirements, maxAmountRequired: '' };
     assert.equal(extractAmount(empty), 0);
@@ -99,6 +110,28 @@ describe('mapToTransaction', () => {
     assert.equal(tx.protocol, 'x402');
     assert.equal(tx.status, 'pending');
     assert.equal(tx.purpose, 'API access fee');
+  });
+
+  it('maps a Nano (XNO) payment to XNO currency and correct amount', async () => {
+    const config: X402PaySentryConfig = {};
+    const payload: X402PaymentPayload = {
+      ...mockPayload,
+      scheme: 'exact',
+      network: 'nano:mainnet',
+    };
+    const reqs: X402PaymentRequirements = {
+      ...mockRequirements,
+      scheme: 'exact',
+      network: 'nano:mainnet',
+      payTo: 'nano_1example',
+      maxAmountRequired: '1000000000000000000000000000000', // 1e30 raw = 1 XNO
+    };
+    const tx = await mapToTransaction(payload, reqs, config);
+
+    assert.equal(tx.amount, 1);
+    assert.equal(tx.currency, 'XNO');
+    assert.equal(tx.recipient, 'nano_1example');
+    assert.equal(tx.protocol, 'x402');
   });
 });
 
